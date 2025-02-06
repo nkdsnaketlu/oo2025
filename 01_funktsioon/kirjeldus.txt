@@ -6,3 +6,6 @@ Arvutus võib olla lihtne, aga lugejatel/kuulajatel võiks käsitletava teema ko
 
 https://minitorn.tlu.ee/~jaagup/kool/java/kursused/25/objektorienteeritud_programmeerimine/juht.html
 
+git add .
+git commit -m "message"
+git push
