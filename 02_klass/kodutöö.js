@@ -14,7 +14,7 @@ var Person = /** @class */ (function () {
     return Person;
 }());
 var person = new Person('Keanu', 'Reeves', 60, "näitleja");
-console.log(person.getFullName());
+//console.log(person.getFullName())
 console.log(person.getFullInfo());
 /*
 class vektor {

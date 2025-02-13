@@ -8,7 +8,7 @@ class Person {
     }
 }
 let person:Person = new Person('Keanu', 'Reeves', 60, "näitleja");
-console.log(person.getFullName())
+//console.log(person.getFullName())
 console.log(person.getFullInfo())
 
 
