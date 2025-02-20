@@ -8,6 +8,7 @@ class Resistor{
         this.draw();
     }
     draw(){
+        this.g.clearRect(this.startx, this.y-this.height/2, this.width, this.height);
         this.g.beginPath();
         this.g.moveTo(this.startx, this.y);
         this.g.lineTo(this.startx+this.width/4, this.y);
@@ -17,6 +18,11 @@ class Resistor{
         this.g.stroke();
         this.g.fillText(this.r+" Ω", this.startx+this.width/3, this.y+3);
     }
+    setR(r:number){
+        this.r=r;
+        this.draw();
+    }
+    getR():number{
+        return this.r;
+    }
 }
-/*let res = new Resistor(150, 100, 50, 30, 20);
-res.draw();*/
