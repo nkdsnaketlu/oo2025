@@ -1,0 +1,18 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Ryan Gosling</title>
+    <script src="graaf.js"></script>
+    <script>
+        let r1;
+        function startPage(){
+           r1=new Gosling(110, canvas1.getContext("2d"), document.getElementById("canvas1"));  
+           range1.value=r1.getR();         
+        }
+    </script>
+  </head>
+  <body onload="startPage()">
+      <canvas id="canvas1" width="500" height="450" style="black"></canvas><img src="https://i.blogs.es/924378/ryan-gosling/500_333.jpeg" alt="ryan gosling"><br>
+      <input type="range" id="range1" min="0" max="255" onclick="r1.setR(this.valueAsNumber)" /><br>
+  </body>
+</html>
