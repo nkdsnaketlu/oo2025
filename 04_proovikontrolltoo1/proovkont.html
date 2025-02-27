@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="et">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hulknurk</title>
+    <script src="proovkont.js"></script>
+    <script>
+        let n1;
+        function startPage(){
+            let n1 = new Kolmnurk([xid[1],xid[2],xid[3]], [yid[1],yid[2],yid[3]], document.getElementById("canvas"), canvas.getContext("2d")); 
+            //n1.addCoord(document.getElementById("x_input"), document.getElementById("y_input"))        
+        }
+    </script>
+</head>
+<body onload="startPage()">
+    <canvas id="canvas" width="400" height="100"></canvas><br />
+    <div id="new_coords">
+        <input type="number" name="x coordinate" id="x_input">
+        <input type="number" name="y coordinate" id="y_input">
+        <button onclick="n1.addCoord(parseFloat(document.getElementById('x_input').value), parseFloat(document.getElementById('y_input').value))">lisada</button>
+    </div>
+</body>
+</html>
