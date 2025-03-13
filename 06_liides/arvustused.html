@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="arvutused.js"></script>
+    <script>
+        let calculators=[]; //declaring a variable that will hold an instance of InchesToCm
+        function startPage(){
+            calculators[0]=new cmToInches();
+            calculators[1]=new InchesToCm();
+            activateCalculator();
+        }
+        function activateCalculator() {
+            type1.innerText = calculators[calculatorSelect.selectIndex].inputUnit();
+            type2.innerText = calculators[calculatorSelect.selectIndex].outputUnit();
+            answer.innerText = "";
+            input1.value = "";
+        }
+        function buttonClick() {
+            answer.innerText = calculators[calculatorSelect.selectIndex].calculate(input1.valueAsNumber).toFixed(2);
+        }
+    </script>
+    <title>Arvutused</title>
+</head>
+<body onload="startPage()">
+    <input type="number" id="input1" onchange="buttonClick()">
+    <span id="type1"></span>
+    <input type="button"  value="=" onclick="buttonClick()"/> &nbsp;
+    <span id="answer"></span><span id="type2"></span>
+    <select name="choose" id="calculatorSelect" onchange="activateCalculator()">
+        <option value="0">cm to inches</option>
+        <option value="1">inches to cms</option>
+    </select>
+</body>
+</html>
