@@ -9,19 +9,19 @@ var PayPalPayment = /** @class */ (function () {
     };
     return PayPalPayment;
 }());
-var CreditCardPayment = /** @class */ (function () {
-    function CreditCardPayment() {
+var debitCardPayment = /** @class */ (function () {
+    function debitCardPayment() {
     }
-    CreditCardPayment.prototype.pay = function (amount) {
-        console.log("Paid $".concat(amount, " using a credit card"));
+    debitCardPayment.prototype.pay = function (amount) {
+        console.log("Paid $".concat(amount, " using a debit card"));
     };
-    CreditCardPayment.prototype.refund = function (amount) {
-        console.log("Refunded $".concat(amount, " to the credit card"));
+    debitCardPayment.prototype.refund = function (amount) {
+        console.log("Refunded $".concat(amount, " to the debit card"));
     };
-    return CreditCardPayment;
+    return debitCardPayment;
 }());
 var payment1 = new PayPalPayment();
-var payment2 = new CreditCardPayment();
+var payment2 = new debitCardPayment();
 payment1.pay(100);
 payment1.refund(50);
 console.log("------------------------------");

@@ -13,18 +13,18 @@ class PayPalPayment implements PaymentProcessor {
   }
 }
 
-class CreditCardPayment implements PaymentProcessor {
+class debitCardPayment implements PaymentProcessor {
   pay(amount: number) {
-      console.log(`Paid $${amount} using a credit card`);
+      console.log(`Paid $${amount} using a debit card`);
   }
 
   refund(amount: number) {
-      console.log(`Refunded $${amount} to the credit card`);
+      console.log(`Refunded $${amount} to the debit card`);
   }
 }
 
 let payment1: PaymentProcessor = new PayPalPayment();
-let payment2: PaymentProcessor = new CreditCardPayment();
+let payment2: PaymentProcessor = new debitCardPayment();
 payment1.pay(100);
 payment1.refund(50);
 console.log("------------------------------");
