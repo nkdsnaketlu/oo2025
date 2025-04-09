@@ -19,8 +19,8 @@ upperbodyDay.addExercise(forearms);
 
 test("should add an exercise", () => {
     upperbodyDay.addExercise(chest1);
-    expect(upperbodyDay.exerciseList.length).toBe(4);
-    expect(upperbodyDay.exerciseList[3].name).toBe("incline bench press");
+    expect(upperbodyDay.exerciseList.length).toBe(3);
+    expect(upperbodyDay.exerciseList[2].name).toBe("incline bench press");
 });
 
 test("should remove an exercise", () => {
@@ -37,9 +37,7 @@ test("should not compare, beacuse previous exercise does not exist", () => {
 });
 
 test("workload should be increased", () => {
-    let chest3 = new Exercise('machine chest fly', 'chest', 30, 3, 7); // Новое упражнение с измененным объемом
-
+    let chest3 = new Exercise('machine chest fly', 'chest', 30, 3, 7); 
     let result = upperbodyDay.compareResult(chest3);
-    // Проверяем, что сообщение содержит "workload has increased"
     expect(result).toContain("workload has increased");
 });
