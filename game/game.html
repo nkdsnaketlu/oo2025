@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Baldur's Gate -10</title>
+    <script src="game.js">
+        function create() {
+            let playerName = document.getElementById('name').value;
+            let weaponIndex = document.getElementById('weapon').value;
+            let playerWeapon = weaponList[weaponIndex]; 
+            
+            let player = new Player(playerName, playerWeapon);
+
+            document.getElementById('player-name').textContent = player.name;
+            document.getElementById('player-health').textContent = player.health;
+            document.getElementById('player-weapon').textContent = player.weapon.name;
+
+            console.log('Player created:', player);
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            document.getElementById("createBtn").addEventListener("click", create);
+        });
+    </script>
+</head>
+<body>
+    <div class="character-sheet">
+        <label for="name">Character's name: </label><br>
+        <input type="text" id="name">
+        
+        <label for="weapon">Choose weapon: </label><br>
+        <select name="weapons" id="weapon">
+            <option value="0">Fists</option>
+            <option value="1">Longsword</option>
+            <option value="2">Battleaxe</option>
+          </select>
+
+        <button id="createBtn">create</button>
+
+        <div class="inventory">
+    
+        </div>
+
+    </div>
+
+    <div class="battle-scene">
+        <div class="player">
+            <p>Name: <span id="player-name"></span></p>
+            <p>Health: <span id="player-health"></span></p>
+            <p>Weapon: <span id="player-weapon"></span></p>
+
+            <div class="buttons">
+                <button id="attack-btn">attack</button>
+                <button id="defend-btn">defend</button>
+            </div>
+
+        </div>
+    
+        <div id="enemy">
+    
+        </div>
+    
+        <div class="textbox">
+    
+        </div>
+    </div>
+</body>
+</html>
