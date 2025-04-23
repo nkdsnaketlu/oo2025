@@ -4,65 +4,210 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Baldur's Gate -10</title>
-    <script src="game.js">
+    <link rel="stylesheet" href="style.css">
+    <script src="game.js"></script>
+    <script>
+        let player;
+        let i = 0;
+        let currentEnemy = enemiesList[i];
+
+
         function create() {
-            let playerName = document.getElementById('name').value;
-            let weaponIndex = document.getElementById('weapon').value;
-            let playerWeapon = weaponList[weaponIndex]; 
-            
-            let player = new Player(playerName, playerWeapon);
+            const playerName = document.getElementById('name').value;
+            const weaponIndex = document.getElementById('weapon').value;
+            const playerWeapon = weaponList[weaponIndex];
 
-            document.getElementById('player-name').textContent = player.name;
-            document.getElementById('player-health').textContent = player.health;
-            document.getElementById('player-weapon').textContent = player.weapon.name;
+            player = new Player(playerName, playerWeapon);
 
-            console.log('Player created:', player);
+            displayStats(player, currentEnemy);
+
+            logMessage(`Player ${player.name} created!`);
+            logMessage(`${currentEnemy.name} has approached!`);
         }
 
+        
+        
+        function checkEnemies(enemiesList) {    
+            let aliveEnemies = enemiesList.filter(enemy => !enemy.isDefeated);
+            
+            if (aliveEnemies.length === 0) {
+                logMessage("🎉 All enemies have been defeated! Congrats!");
+                window.open("https://www.youtube.com/watch?v=y8Yd9Wj1EAk");
+            } else {
+                currentEnemy.dropItem(player);
+                currentEnemy.defeat();
+                showItems();
+                //logMessage(currentEnemy.isDefeated);
+                nextEnemy(currentEnemy);
+            }
+            displayStats(player, currentEnemy);
+        }
+        
+        function displayStats(character, enemy = null) {
+            document.getElementById("playerName").textContent = character.name;
+            document.getElementById("playerHealth").textContent = character.health;
+            document.getElementById("playermaxHealth").textContent = character.maxHealth;
+            document.getElementById("playerStamina").textContent = character.stamina;
+            document.getElementById("playermaxStamina").textContent = character.maxStamina;
+            document.getElementById("playerWeapon").textContent = character.weapon.name;
+            
+            if (enemy) {
+                document.getElementById("enemyName").textContent = enemy.name;
+                document.getElementById("enemyHealth").textContent = enemy.health;
+                document.getElementById("enemyStamina").textContent = enemy.stamina;
+                document.getElementById("enemyWeapon").textContent = enemy.weapon.name;
+            }
+        }
+        
+        
+        function startGame(){
+            displayStats(player, currentEnemy);
+        }
+        
+        function nextEnemy(enemy){
+            i++;
+            currentEnemy = enemiesList[i];
+            displayStats(player, currentEnemy);
+        }
+        
+        function skip(){
+            currentEnemy.attack(player);
+            if (player.health <= 0) {
+                player.defeat();
+                window.open("https://www.youtube.com/watch?v=3VBn4b1rxf0");
+            }
+        }
+        
+        function showItems() {
+            const invContainer = document.querySelector(".inventory");
+            invContainer.innerHTML = "";
+            
+            player.itemsInInventory.forEach((item, index) => {
+                const itemDiv = document.createElement("div");
+                itemDiv.classList.add("inventory-item");
+                
+                const nameSpan = document.createElement("span");
+                nameSpan.textContent = item.name;
+                itemDiv.appendChild(nameSpan);
+                
+                const applyBtn = document.createElement("button");
+                applyBtn.textContent = "use";
+                applyBtn.addEventListener("click", () => {
+                    if (item.name === heal) {
+                        player.useItem(item);
+                    } else {
+                        player.useItem(item);
+                        player.itemsInInventory.splice(index, 1);
+                    }
+                    displayStats(player, currentEnemy);
+                    showItems();
+                });
+                itemDiv.appendChild(applyBtn);
+                
+                invContainer.appendChild(itemDiv);
+            });
+        }
+        
+        
         document.addEventListener("DOMContentLoaded", function () {
             document.getElementById("createBtn").addEventListener("click", create);
+            document.getElementById("defendBtn").addEventListener("click", () => {
+                player.addItem(heal);
+                logMessage(currentEnemy.weapon.name);
+                const defendCost = 25;
+                if (player.stamina < defendCost) {
+                    logMessage("Not enough stamina to defend!");
+                    return;
+                } else {
+                    player.stamina -= defendCost;
+                    const blocked = Math.floor(currentEnemy.damagePoints / 2);
+                    player.health = Math.max(0, player.health - blocked);
+                    logMessage(`${player.name} blocked ${blocked} damage!`);
+                }
+
+                if (player.health === 0) {
+                    player.defeat();
+                    return;
+                }
+
+                displayStats(player, currentEnemy);
+            });
+            document.getElementById("attackBtn").addEventListener("click", () => {
+                const stamCost = 10 + (player.weapon.stats / 2);
+                if (player.stamina < stamCost) {
+                    logMessage("You don't have enough stamina to attack!");
+                    return;
+                } else {
+                    currentEnemy.health = Math.max(0, currentEnemy.health - player.damagePoints);
+                    player.stamina -= stamCost;
+                    logMessage(`${currentEnemy.name} received ${player.damagePoints} damage!`);
+                    if (currentEnemy.health === 0) {
+                        currentEnemy.defeat();
+                        logMessage(`${currentEnemy.name} was defeated!`);
+                        checkEnemies(enemiesList);
+                    } else {
+                        skip();
+                    }
+                }
+                displayStats(player, currentEnemy);
+
+            });
+            document.getElementById('waitBtn').addEventListener('click', () => {
+                const regen = player.weapon.stats;
+                player.stamina = Math.min(player.maxStamina, player.stamina + regen);
+                logMessage(`You skipped your turn`);
+                skip();
+                displayStats(player, currentEnemy);
+            });
         });
     </script>
 </head>
 <body>
     <div class="character-sheet">
         <label for="name">Character's name: </label><br>
-        <input type="text" id="name">
+        <input type="text" id="name"><br>
         
         <label for="weapon">Choose weapon: </label><br>
         <select name="weapons" id="weapon">
             <option value="0">Fists</option>
             <option value="1">Longsword</option>
             <option value="2">Battleaxe</option>
+            <option value="3">Enchanted stick</option>
           </select>
 
         <button id="createBtn">create</button>
-
+        
         <div class="inventory">
-    
+            
         </div>
-
+        
     </div>
-
+    
     <div class="battle-scene">
         <div class="player">
-            <p>Name: <span id="player-name"></span></p>
-            <p>Health: <span id="player-health"></span></p>
-            <p>Weapon: <span id="player-weapon"></span></p>
-
+            <p>Name: <span id="playerName"></span></p>
+            <p>Health: <span id="playerHealth"></span>/<span id="playermaxHealth"></span> </p>
+            <p>Stamina: <span id="playerStamina"></span>/<span id="playermaxStamina"></span></p>
+            <p>Weapon: <span id="playerWeapon"></span></p>
+            
+            
+        </div>
+        
+        <div class="enemy">
+            <p>Name: <span id="enemyName"></span></p>
+            <p>Health: <span id="enemyHealth"></span></p>
+            <p>Weapon: <span id="enemyWeapon"></span></p>
+            
+        </div>
+        </div>
+        <div class="interface">
             <div class="buttons">
-                <button id="attack-btn">attack</button>
-                <button id="defend-btn">defend</button>
+                <button id="attackBtn">attack</button>
+                <button id="defendBtn">defend</button>
+                <button id="waitBtn">wait</button>
             </div>
-
-        </div>
-    
-        <div id="enemy">
-    
-        </div>
-    
-        <div class="textbox">
-    
+            
+            <div class="textbox" id="battle-log" style="background-color: #111; color: #0f0; padding: 10px; height: 200px; overflow-y: auto; font-family: monospace; font-size: 14px;">
         </div>
     </div>
 </body>

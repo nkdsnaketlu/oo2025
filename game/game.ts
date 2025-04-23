@@ -1,26 +1,44 @@
-import { log } from "console";
+function logMessage(message) {
+    const logBox = document.getElementById("battle-log");
+    if (!logBox) {
+        console.warn("LOG BOX NOT FOUND");
+        return;
+    }
+    const entry = document.createElement("div");
+    entry.textContent = message;
+    logBox.appendChild(entry);
+    logBox.scrollTop = logBox.scrollHeight;
+}
 
 abstract class Character {
     name: string;
     level: number;
     health: number = 100;
-    maxHealth: number;
+    maxHealth: number = 100;
     stamina: number = 100;
-    maxStamina: number;
+    maxStamina: number = 100;
     damagePoints: number = 10;
     weapon: Item;
     isDefeated: boolean = false;
 
+    abstract defeat(): void;
+
     attack(enemy:Character):void {
-        enemy.health -= this.damagePoints;
-        this.stamina -= (10 + (this.weapon.stats/2));
-        console.log(enemy.name + "received " + this.damagePoints + 'damage!');
+        if (enemy.health <= 0) {
+            enemy.defeat();
+        } else {
+            enemy.health -= this.damagePoints;
+            this.stamina -= (10 + (this.weapon.stats/2));
+            /*console.log(`${enemy.name} received ${this.damagePoints} damage!`);*/
+            logMessage(`${enemy.name} received ${this.damagePoints} damage!`);
+        }
     }
 
     defend(enemy:Character):void {
         this.health = this.health - (enemy.damagePoints/2);
         this.stamina = this.stamina - 25;
-        console.log(this.name + " defended himself from " + enemy.name + ' attack!');
+        /*console.log(this.name + " defended himself from " + enemy.name + ' attack!');*/
+        logMessage(this.name + " defended himself from " + enemy.name + ' attack!');
     }
 }
 
@@ -32,13 +50,14 @@ class Player extends Character {
         super();
         this.name = name;
         this.weapon = weapon;
+        this.damagePoints = this.weapon.stats;
     }
 
     defeat(): void{
         if (this.health <= 0){
             this.isDefeated = true;
-            console.log('game over');
-            console.log('better luck next time!');
+            logMessage('game over');
+            logMessage('better luck next time!');
         }
     }
 
@@ -48,7 +67,7 @@ class Player extends Character {
     
     addItem(item:Item){
         this.itemsInInventory.push(item);
-        console.log(item.name + ' is added to ' + this.name + "'s inventory!");
+        logMessage(item.name + ' is added to ' + this.name + "'s inventory!");
         
     }
     
@@ -56,28 +75,31 @@ class Player extends Character {
         if (item.type === "food" || item.name === "health potion") {
             if (this.health < this.maxHealth) {
                 this.health = this.health + item.stats;
-                console.log(this.name + " recovered " + item.stats + " points of health");
+                logMessage(this.name + " recovered " + item.stats + "HP");
             } else {
-                console.log('you already have full hp');
+                logMessage('you already have full hp');
             }
         } else if (item.type === "potion") {
             if (item.name.includes("stamina")) {
                 if (this.stamina < this.maxStamina) {
                     this.stamina = this.stamina + item.stats;
-                    console.log(this.name + " recovered " + item.stats + " points of stamina");
+                    logMessage(this.name + " recovered " + item.stats + " points of stamina");
                     
                 } else {
-                    console.log('You already have full stamina');
+                    logMessage('You already have full stamina');
                 }
             } else if (item.name === "damage potion") {
                 this.damagePoints = this.damagePoints + item.stats;
-                console.log(this.name + " now deals " + this.damagePoints + " damage per attack!");
+                logMessage(this.name + " now deals " + this.damagePoints + " damage per attack!");
+            } else if (item.name.includes("heal")) {
+                this.health += item.stats;
+                logMessage(this.name + " recovered " + item.stats + "HP");
             }
         } else if (item.type === "weapon") {
             this.damagePoints += item.stats;
-            console.log(this.name + ' has equipped ' + item.name + '!');
+            logMessage(this.name + ' has equipped ' + item.name + '!');
         } else {
-            console.log('you used garbage, congrats 🥳');
+            logMessage('you used garbage, congrats 🥳');
         }
     }
 
@@ -92,7 +114,7 @@ class Player extends Character {
             this.health = this.maxHealth;
             this.maxStamina += 10;
             this.stamina = this.maxStamina;
-            console.log(this.name + ' has leveled up!');
+            logMessage(this.name + ' has leveled up!');
             this.recountDamage();
         }
     }
@@ -105,6 +127,9 @@ class Enemy extends Character {
         this.name = name;
         this.typeOfLoot = typeOfLoot;
         this.chanceOfDrop = chanceOfDrop;
+        this.weapon = weapon;
+        this.damagePoints = weapon.stats;
+
     }
 
     defeat(): void{
@@ -114,13 +139,13 @@ class Enemy extends Character {
     }
 
     dropItem(enemy: Player){
-        let randomNumber = Math.random() * 10;
-        if (randomNumber < this.chanceOfDrop) {
-            let  randomItem =  this.typeOfLoot[Math.floor(Math.random() * 3)];
-            console.log(this.name + ' has dropped ' + randomItem.name + '!');
+        let randomNumber = Math.floor(Math.random() * 10);
+        if (randomNumber > this.chanceOfDrop) {
+            let randomItem = this.typeOfLoot[Math.floor(Math.random() * this.typeOfLoot.length)];
+            logMessage(this.name + ' has dropped ' + randomItem.name + '!');
             enemy.addItem(randomItem);
         } else {
-            console.log(this.name + ' was too broke 😥');
+            logMessage(this.name + ' was too broke 😥');
         }
     }
 }
@@ -136,10 +161,17 @@ class Item {
     }
 }
 
-let item1 = new Item('item', 'food', 5);
-let item2 = new Item('item2', 'weapon', 5);
-let item3 = new Item('item3', 'potion', 5);
-let enemyItems = [item1, item2, item3];
+let item1 = new Item('onigiri', 'food', 5);
+let item2 = new Item('stick', 'weapon', 1);
+let item3 = new Item('Photo of a woman', 'else', 5);
+let bear = new Item('Clive', 'else', 0);
+let boo = new Item("hamster's food", 'food', 1);
+let revscroll = new Item("used Scroll of Revivify", 'else', 0);
+let water = new Item("Water bottle", 'food', 1);
+let heal = new Item("Huge healing potion", 'potion', 100);
+let majimaItems = [item1, item2, item3];
+let minscItems = [boo, revscroll, water];
+let karlachItems = [bear, heal, water];
 
 let apple = new Item('Apple', 'food', 5);
 let potion = new Item('Staminan Royale ', 'potion', 15);
@@ -147,9 +179,19 @@ let potion = new Item('Staminan Royale ', 'potion', 15);
 let fists = new Item('fists', 'weapon', 5);
 let longsword = new Item('longsword', 'weapon', 10);
 let battleaxe = new Item('battleaxe', 'weapon', 20);
-let weaponList = [fists, longsword, battleaxe];
+let enchstick = new Item('enchanted stick', 'weapon', 50);
+let bat = new Item('Sturdy Baseball Bat', 'weapon', 25);
+let weaponList = [fists, longsword, battleaxe, enchstick];
 
-let kiryu = new Player("Kiryu Kazuma", fists);
+/*let kiryu = new Player("Kiryu Kazuma", fists);
 kiryu.useItem(fists);
 kiryu.addItem(potion);
-kiryu.addItem(apple);
+kiryu.addItem(apple);*/
+
+let majima = new Enemy('Goro Majima', bat, majimaItems, 9);
+let minsc = new Enemy('Minsc', fists, minscItems, 2)
+let karlach = new Enemy('Karlach', battleaxe, karlachItems, 5)
+
+let enemiesList = [minsc, karlach, majima]
+
+console.log(minsc.weapon.name);
